@@ -15,7 +15,7 @@ export class SocketService {
 
   listenForEvents() {
     this.io.on(Events.ServerPlayersUpdate, data => {
-      console.log(data);
+      console.log('Current players:', data);
     });
   }
 }
