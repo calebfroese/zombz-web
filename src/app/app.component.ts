@@ -10,16 +10,18 @@ import { SocketService } from './shared/socket.service';
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
+  game: Phaser.Game;
   players$: Observable<any>;
   constructor(public socket: SocketService) {}
 
   ngOnInit() {
     this.socket.connect();
     this.players$ = this.socket.getPlayers();
-    const game = new Phaser.Game({
+    const self = this;
+    this.game = new Phaser.Game({
       type: Phaser.AUTO,
-      width: window.outerWidth,
-      height: window.outerHeight,
+      width: window.innerWidth,
+      height: window.innerHeight,
       backgroundColor: '#0000ff',
       physics: {
         default: 'arcade',
@@ -28,13 +30,24 @@ export class AppComponent implements OnInit {
         },
       },
       scene: {
-        preload: () => {
-          console.log('preload');
+        preload: function() {
+          return self.preload(this);
         },
-        create: () => {
-          console.log('create');
+        create: function() {
+          return self.create(this);
         },
       },
     });
+  }
+
+  preload(scene: Phaser.Scene) {
+    scene.load.image(
+      'player',
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRR-ZPm-cFMR2SoVYEwXj6-woa6gWj4iG9s4H-FS7FXQlevcPZ87g',
+    );
+  }
+
+  create(scene: Phaser.Scene) {
+    scene.add.image(500, 500, 'player');
   }
 }
