@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
 
 import { SocketService } from './shared/socket.service';
 
@@ -8,10 +9,11 @@ import { SocketService } from './shared/socket.service';
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
-  title = 'app';
+  players$: Observable<any>;
   constructor(public socket: SocketService) {}
 
   ngOnInit() {
     this.socket.connect();
+    this.players$ = this.socket.getPlayers();
   }
 }
