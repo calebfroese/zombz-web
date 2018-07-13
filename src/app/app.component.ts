@@ -13,6 +13,7 @@ export class AppComponent implements OnInit {
   game: Phaser.Game;
   scene: Phaser.Scene;
   self: Phaser.GameObjects.Image;
+  players: { [key: string]: Phaser.GameObjects.Image } = {};
   constructor(public socket: SocketService) {}
 
   ngOnInit() {
@@ -52,32 +53,39 @@ export class AppComponent implements OnInit {
     this.self = this.scene.add
       .image(500, 500, 'player')
       .setDisplaySize(100, 100);
+    this.socket.getPlayers().subscribe(players => {
+      players.forEach(player => {
+        if (player.id === this.socket.getId()) {
+          this.self.setPosition(player.position.x, player.position.y);
+        } else {
+          if (!this.players[player.id]) {
+            this.players[player.id] = this.scene.add
+              .image(500, 500, 'player')
+              .setDisplaySize(100, 100);
+          }
+          this.players[player.id].setPosition(
+            player.position.x,
+            player.position.y,
+          );
+        }
+      });
+    });
   }
 
   update() {
     const up = this.scene.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.W,
-    );
+    ).isDown;
     const down = this.scene.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.S,
-    );
+    ).isDown;
     const left = this.scene.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.A,
-    );
+    ).isDown;
     const right = this.scene.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.D,
-    );
-    if (down.isDown) {
-      this.self.y += 1;
-    }
-    if (up.isDown) {
-      this.self.y -= 1;
-    }
-    if (left.isDown) {
-      this.self.x -= 1;
-    }
-    if (right.isDown) {
-      this.self.x += 1;
-    }
+    ).isDown;
+    const movement = { up, down, left, right };
+    this.socket.sendUser([movement]);
   }
 }

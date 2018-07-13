@@ -28,4 +28,8 @@ export class SocketService {
   getId() {
     return this.io.id;
   }
+
+  sendUser(data: any[]) {
+    this.io.emit(Events.UserUpdate, data);
+  }
 }
