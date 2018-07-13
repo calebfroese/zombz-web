@@ -11,23 +11,20 @@ import { SocketService } from './shared/socket.service';
 })
 export class AppComponent implements OnInit {
   game: Phaser.Game;
-  players$: Observable<any>;
+  scene: Phaser.Scene;
+  self: Phaser.GameObjects.Image;
   constructor(public socket: SocketService) {}
 
   ngOnInit() {
     this.socket.connect();
-    this.players$ = this.socket.getPlayers();
     const self = this;
     this.game = new Phaser.Game({
       type: Phaser.AUTO,
       width: window.innerWidth,
       height: window.innerHeight,
       backgroundColor: '#0000ff',
-      physics: {
-        default: 'arcade',
-        arcade: {
-          gravity: { y: 200 },
-        },
+      input: {
+        keyboard: true,
       },
       scene: {
         preload: function() {
@@ -36,18 +33,51 @@ export class AppComponent implements OnInit {
         create: function() {
           return self.create(this);
         },
+        update: function() {
+          return self.update();
+        },
       },
     });
   }
 
   preload(scene: Phaser.Scene) {
-    scene.load.image(
+    this.scene = scene;
+    this.scene.load.image(
       'player',
       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRR-ZPm-cFMR2SoVYEwXj6-woa6gWj4iG9s4H-FS7FXQlevcPZ87g',
     );
   }
 
   create(scene: Phaser.Scene) {
-    scene.add.image(500, 500, 'player');
+    this.self = this.scene.add
+      .image(500, 500, 'player')
+      .setDisplaySize(100, 100);
+  }
+
+  update() {
+    const up = this.scene.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.W,
+    );
+    const down = this.scene.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.S,
+    );
+    const left = this.scene.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.A,
+    );
+    const right = this.scene.input.keyboard.addKey(
+      Phaser.Input.Keyboard.KeyCodes.D,
+    );
+    if (down.isDown) {
+      this.self.y += 1;
+    }
+    if (up.isDown) {
+      this.self.y -= 1;
+    }
+    if (left.isDown) {
+      this.self.x -= 1;
+    }
+    if (right.isDown) {
+      this.self.x += 1;
+    }
   }
 }

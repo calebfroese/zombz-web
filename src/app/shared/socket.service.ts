@@ -24,4 +24,8 @@ export class SocketService {
   getPlayers() {
     return this.players$;
   }
+
+  getId() {
+    return this.io.id;
+  }
 }
