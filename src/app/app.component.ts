@@ -1,3 +1,4 @@
+import * as Phaser from 'phaser';
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
@@ -15,5 +16,25 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     this.socket.connect();
     this.players$ = this.socket.getPlayers();
+    const game = new Phaser.Game({
+      type: Phaser.AUTO,
+      width: window.outerWidth,
+      height: window.outerHeight,
+      backgroundColor: '#0000ff',
+      physics: {
+        default: 'arcade',
+        arcade: {
+          gravity: { y: 200 },
+        },
+      },
+      scene: {
+        preload: () => {
+          console.log('preload');
+        },
+        create: () => {
+          console.log('create');
+        },
+      },
+    });
   }
 }
